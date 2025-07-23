@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌟 Advanced To-Do Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 20px;
+      color: #333;
+      overflow-x: hidden;
+      animation: gradientShift 10s infinite alternate;
+    }
+
+    @keyframes gradientShift {
+      0% { background: linear-gradient(135deg, #6e8efb, #a777e3); }
+      100% { background: linear-gradient(135deg, #a777e3, #6e8efb); }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 20px;
+      width: 95%;
+      max-width: 800px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      display: none;
+      transition: all 0.5s ease-in-out;
+      border: 2px solid #a777e3;
+    }
+
+    .container.active {
+      display: block;
+      transform: scale(1.02);
+    }
+
+    h1 {
+      text-align: center;
+      color: #6e8efb;
+      margin-bottom: 30px;
+      font-size: 2.8em;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+      justify-content: center;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .input-group input, .input-group select {
+      padding: 14px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      background: #f8f9fa;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+      border-color: #6e8efb;
+      box-shadow: 0 0 8px rgba(110, 142, 251, 0.5);
+    }
+
+    .input-group button {
+      padding: 14px 30px;
+      background: linear-gradient(45deg, #6e8efb, #a777e3);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .input-group button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(45deg, #a777e3, #6e8efb);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f9f9f9;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-left: 6px solid #a777e3;
+      transition: all 0.3s ease;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    li:hover {
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px);
+    }
+
+    .task-details span {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 1rem;
+      color: #444;
+    }
+
+    .done .task-text {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .icons button {
+      background: none;
+      color: #a777e3;
+      font-size: 1.4rem;
+      margin-left: 12px;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.3s;
+    }
+
+    .icons button:hover {
+      color: #6e8efb;
+      transform: scale(1.2);
+    }
+
+    #authOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+      animation: fadeInOverlay 0.5s ease;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #authOverlay > div {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: bounceIn 0.7s ease;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .reminder-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #e9c46a;
+      color: #333;
+      padding: 15px 25px;
+      border-radius: 10px;
+      display: none;
+      max-width: 320px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border-left: 4px solid #d4a017;
+      animation: popIn 0.5s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="authOverlay">
+    <div>
+      <h2>Simulated Login</h2>
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <div class="container" id="todoContainer">
+    <h1>🌟 Advanced To-Do Manager</h1>
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Enter task..." required />
+      <input type="date" id="dueDate" />
+      <select id="priority">
+        <option value="Low">Low</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="High">High</option>
+      </select>
+      <input type="text" id="notes" placeholder="Add notes..." />
+      <input type="time" id="reminderTime" />
+      <input type="number" id="progress" min="0" max="100" placeholder="Progress (%)" />
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <ul id="taskList"></ul>
+    <div id="reminderNotification" class="reminder-notification"></div>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const dueDate = document.getElementById("dueDate");
+    const priority = document.getElementById("priority");
+    const notes = document.getElementById("notes");
+    const reminderTime = document.getElementById("reminderTime");
+    const progress = document.getElementById("progress");
+    const taskList = document.getElementById("taskList");
+    const todoContainer = document.getElementById("todoContainer");
+    const authOverlay = document.getElementById("authOverlay");
+    const reminderNotification = document.getElementById("reminderNotification");
+
+    let tasks = [];
+    let audioContext = null;
+
+    // Your actual API Gateway URL:
+    const API_URL = "https://h8fkk4wix1.execute-api.us-east-1.amazonaws.com/dev/tasks";
+
+    // Simulate login then load tasks
+    setTimeout(() => {
+      authOverlay.style.display = "none";
+      todoContainer.classList.add("active");
+      fetchTasks();
+    }, 1000);
+
+    function initializeAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq = 440, duration = 200) {
+      if (!audioContext) return;
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.type = 'sine';
+      oscillator.frequency.value = freq;
+      oscillator.start();
+      gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration / 1000);
+    }
+
+    function showReminder(taskText, dueDateStr) {
+      const now = new Date();
+      const due = new Date(dueDateStr);
+      if (due > now && due - now <= 86400000) { // Due within 24 hours
+        reminderNotification.textContent = `Reminder: "${taskText}" is due on ${dueDateStr}!`;
+        reminderNotification.style.display = "block";
+        setTimeout(() => reminderNotification.style.display = "none", 5000);
+        initializeAudio();
+        playTone(300);
+      }
+    }
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) return;
+
+      const progVal = progress.value === "" ? 0 : parseInt(progress.value);
+      const task = {
+        text,
+        date: dueDate.value || "No due date",
+        prio: priority.value,
+        note: notes.value.trim() || "No notes",
+        remindTime: reminderTime.value || null,
+        prog: progVal
+      };
+
+      task.id = Date.now().toString();
+      tasks.push(task);
+      addTaskToDOM(task);
+      initializeAudio();
+      playTone(900);
+
+      // Save to backend
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(task)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.id) {
+          const index = tasks.findIndex(t => t.id === task.id);
+          if (index !== -1) tasks[index].id = data.id;
+        }
+      })
+      .catch(error => console.error("Error adding task:", error));
+
+      // Clear inputs
+      taskInput.value = "";
+      dueDate.value = "";
+      notes.value = "";
+      reminderTime.value = "";
+      progress.value = "";
+    }
+
+    function fetchTasks() {
+      fetch(API_URL, { method: "GET" })
+      .then(response => response.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          tasks = data.map(task => ({ ...task, id: task.id || Date.now().toString() }));
+        } else if (data.Items) {
+          tasks = data.Items.map(item => ({ ...item, id: item.id || Date.now().toString() }));
+        }
+        taskList.innerHTML = "";
+        tasks.forEach(task => addTaskToDOM(task));
+      })
+      .catch(error => console.error("Error fetching tasks:", error));
+    }
+
+    function updateTask(taskId, updatedTask) {
+      fetch(`${API_URL}/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTask)
+      })
+      .then(response => response.json())
+      .then(() => {
+        fetchTasks();
+        initializeAudio();
+        playTone(660);
+      })
+      .catch(error => console.error("Error updating task:", error));
+    }
+
+    function deleteTask(taskId) {
+      fetch(`${API_URL}/${taskId}`, { method: "DELETE" })
+      .then(() => {
+        tasks = tasks.filter(task => task.id !== taskId);
+        taskList.innerHTML = "";
+        tasks.forEach(task => addTaskToDOM(task));
+        initializeAudio();
+        playTone(200);
+      })
+      .catch(error => console.error("Error deleting task:", error));
+    }
+
+    function addTaskToDOM(task) {
+      const li = document.createElement("li");
+      const details = document.createElement("div");
+      details.className = "task-details";
+
+      const taskText = document.createElement("span");
+      taskText.className = "task-text";
+      taskText.textContent = task.text;
+
+      const dueDateSpan = document.createElement("span");
+      dueDateSpan.className = "due-date";
+      dueDateSpan.textContent = `Due: ${task.date}`;
+      if (task.date !== "No due date") showReminder(task.text, task.date);
+
+      const prioritySpan = document.createElement("span");
+      prioritySpan.className = "priority";
+      prioritySpan.textContent = `Priority: ${task.prio}`;
+
+      const notesSpan = document.createElement("span");
+      notesSpan.className = "notes";
+      notesSpan.textContent = `Notes: ${task.note}`;
+
+      const progressSpan = document.createElement("span");
+      progressSpan.className = "progress";
+      progressSpan.textContent = `Progress: ${task.prog}%`;
+
+      details.append(taskText, dueDateSpan, prioritySpan, notesSpan, progressSpan);
+
+      if (task.remindTime) {
+        const reminderSpan = document.createElement("span");
+        reminderSpan.className = "reminder";
+        reminderSpan.textContent = `Reminder: ${task.remindTime}`;
+        details.appendChild(reminderSpan);
+      }
+
+      const icons = document.createElement("div");
+      icons.className = "icons";
+
+      const editBtn = document.createElement("button");
+      editBtn.innerHTML = "✏️";
+      editBtn.title = "Edit Task";
+      editBtn.onclick = () => {
+        const newText = prompt("Edit task:", task.text);
+        const newDate = prompt("Edit due date (YYYY-MM-DD):", task.date);
+        const newPrio = prompt("Edit priority (Low/Medium/High):", task.prio);
+        const newNote = prompt("Edit notes:", task.note);
+        const newRemind = prompt("Edit reminder time (HH:MM):", task.remindTime);
+        const newProg = prompt("Edit progress (0-100):", task.prog);
+
+        if (newText) {
+          const updatedTask = {
+            ...task,
+            text: newText,
+            date: newDate || "No due date",
+            prio: newPrio || "Low",
+            note: newNote || "No notes",
+            remindTime: newRemind || null,
+            prog: newProg === null || newProg === "" ? 0 : parseInt(newProg)
+          };
+          updateTask(task.id, updatedTask);
+        }
+      };
+
+      const doneBtn = document.createElement("button");
+      doneBtn.innerHTML = "✅";
+      doneBtn.title = "Mark Done";
+      doneBtn.onclick = () => {
+        li.classList.toggle("done");
+        initializeAudio();
+        playTone(li.classList.contains("done") ? 350 : 500);
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerHTML = "🗑️";
+      deleteBtn.title = "Delete Task";
+      deleteBtn.onclick = () => {
+        if (task.id) deleteTask(task.id);
+        li.remove();
+        tasks = tasks.filter(t => t.id !== task.id);
+        initializeAudio();
+        playTone(200);
+      };
+
+      icons.append(editBtn, doneBtn, deleteBtn);
+      li.append(details, icons);
+      taskList.appendChild(li);
+    }
+
+    taskInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        addTask();
+      }
+    });
+
+    // Initialize audio context on first user interaction
+    document.addEventListener("click", initializeAudio, { once: true });
+  </script>
+</body>
+</html>
