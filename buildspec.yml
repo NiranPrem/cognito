@@ -2,21 +2,15 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      python: 3.x
     commands:
-      - echo Installing dependencies (if any)
-      # Add install commands here if you have dependencies
-
+      - echo Installing dependencies if any
+      - yum install -y awscli  # Install AWS CLI if not already present
   build:
     commands:
-      - echo Syncing files to S3 bucket...
-      - aws s3 sync . s3://todolatest996144 --exact-timestamps
-      - echo Setting public-read ACL for all tracked files...
-      - |
-        for file in $(git ls-files); do
-          aws s3api put-object-acl --bucket todolatest996144 --key "$file" --acl public-read
-        done
+      - echo Build started on `date`
+      - echo Syncing files to S3 bucket
+      # Sync files to your S3 bucket, update only, don't delete, and make files public
+      - aws s3 sync . s3://your-bucket-name --exact-timestamps --acl public-read
 
 artifacts:
   files:
