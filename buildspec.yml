@@ -2,14 +2,19 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      python: 3.x
     commands:
-      - echo Installing dependencies if any
+      - echo "Installing AWS CLI..."
       - yum install -y awscli
+
   build:
     commands:
-      - echo Build started on `date`
-      - echo Syncing files to S3 bucket todolatest996144
+      - echo "Build started on $(date)"
+      - echo "Syncing files to S3 bucket: todolatest996144"
       - aws s3 sync . s3://todolatest996144 --exact-timestamps --acl public-read
+      - echo "Creating CloudFront invalidation..."
+      - aws cloudfront create-invalidation --distribution-id E3S8CPREKISFA1 --paths "/*"
 
 artifacts:
   files:
