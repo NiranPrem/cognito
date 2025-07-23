@@ -4,13 +4,12 @@ phases:
   install:
     commands:
       - echo Installing dependencies if any
-      - yum install -y awscli  # Install AWS CLI if not already present
+      - yum install -y awscli
   build:
     commands:
       - echo Build started on `date`
-      - echo Syncing files to S3 bucket
-      # Sync files to your S3 bucket, update only, don't delete, and make files public
-      - aws s3 sync . s3://your-bucket-name --exact-timestamps --acl public-read
+      - echo Syncing files to S3 bucket todolatest996144
+      - aws s3 sync . s3://todolatest996144 --exact-timestamps --acl public-read
 
 artifacts:
   files:
